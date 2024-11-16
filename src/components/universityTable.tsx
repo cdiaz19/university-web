@@ -3,6 +3,7 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack
 import { PageInfo, University } from '../types';
 import { fetchUniversities } from '../services';
 import Pagination from './pagination';
+import { Spinner } from './spinner';
 
 const UniversityTable = () =>  {
   const [universities, setUniversities] = useState<University[]>([]);
@@ -11,19 +12,32 @@ const UniversityTable = () =>  {
     total_pages: 1,
     total_entries: 0,
   });
+  const [loading, setLoading] = useState(false);
 
   const fetchData = async (page: number = 1) => {
+    setLoading(true);
+
     try {
       const { data } = await fetchUniversities(page);
       setUniversities(data.universities);
       setPageInfo(data.page_info);
+      setLoading(false);
     } catch (err: any) {
       console.log('err ', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    setLoading(true);
+    const timeout = setTimeout(() => setLoading(true), 5000);
+
+    setTimeout(() => {
+      fetchData();
+    }, 5000);
+
+    clearTimeout(timeout);
   }, []);
 
   const columns: ColumnDef<University>[] = [
@@ -46,6 +60,10 @@ const UniversityTable = () =>  {
   ]
 
   const table = useReactTable({columns, data: universities, getCoreRowModel: getCoreRowModel()})
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <>

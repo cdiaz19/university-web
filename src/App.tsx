@@ -4,7 +4,7 @@ import './App.css';
 function App() {
   return (
     <>
-      <span> University Web </span>
+      <header className="header">SmarterSelect - University Management</header>
       <div className="mt-4">
         <UniversityTable />
       </div>
