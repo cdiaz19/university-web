@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { ColumnDef, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { PageInfo, University } from '../types';
 import { fetchUniversities } from '../services';
 import Pagination from './pagination';
@@ -40,14 +41,27 @@ const UniversityTable = () =>  {
     clearTimeout(timeout);
   }, []);
 
+  const getSortIcon = (isSorted: string | false) => {
+    switch (isSorted) {
+      case 'asc':
+        return <ChevronUpIcon className="w-4 h-4 inline" />;
+      case 'desc':
+        return <ChevronDownIcon className="w-4 h-4 inline" />;
+      default:
+        return null;
+    }
+  };
+
   const columns: ColumnDef<University>[] = [
     {
       accessorKey: 'name',
       header: 'Name',
+      enableSorting: true,
     },
     {
       accessorKey: 'location',
       header: 'Location',
+      enableSorting: true,
     },
     {
       accessorKey: 'contact_emails',
@@ -56,28 +70,50 @@ const UniversityTable = () =>  {
     {
       accessorKey: 'website',
       header: 'Website',
+      enableSorting: true,
     },
-  ]
+  ];
 
-  const table = useReactTable({columns, data: universities, getCoreRowModel: getCoreRowModel()})
+  const table = useReactTable({
+    columns,
+    data: universities,
+    sortDescFirst: true,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  });
 
   if (loading) {
     return <Spinner />;
-  }
+  };
 
   return (
     <>
       <div className="mt-4">
         <table className="min-w-full table-auto border-collapse border border-gray-300 rounded-lg shadow-md">
-          <thead className="bg-gray-100">
-            {table.getHeaderGroups().map((headerGroup) => (
+          <thead className="bg-gray-100 text-center ">
+            {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map(header => (
                   <th
-                    key={header.id}
+                    key={header.id} colSpan={header.colSpan}
                     className="px-6 py-3 text-sm font-semibold text-gray-700 text-center uppercase tracking-wider border-b border-gray-200"
                     >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={
+                          header.column.getCanSort()
+                            ? 'cursor-pointer select-none flow-root items-center'
+                            : ''
+                        }
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {getSortIcon(header.column.getIsSorted())}
+                      </div>
+                    )}
                   </th>
                 ))}
               </tr>
@@ -111,4 +147,4 @@ const UniversityTable = () =>  {
 
 }
 
-export default UniversityTable
+export default UniversityTable;
