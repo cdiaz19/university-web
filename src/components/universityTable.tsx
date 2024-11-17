@@ -5,6 +5,7 @@ import { PageInfo, University } from '../types';
 import { fetchUniversities } from '../services';
 import Pagination from './pagination';
 import { Spinner } from './spinner';
+import { Search } from './search';
 
 const UniversityTable = () =>  {
   const [universities, setUniversities] = useState<University[]>([]);
@@ -14,6 +15,8 @@ const UniversityTable = () =>  {
     total_entries: 0,
   });
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredUniversities, setFilteredUniversities] = useState<University[]>([]);
 
   const fetchData = async (page: number = 1) => {
     setLoading(true);
@@ -40,6 +43,18 @@ const UniversityTable = () =>  {
 
     clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredUniversities(universities);
+    } else {
+      setFilteredUniversities(
+        universities.filter((university) =>
+          university.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+  }, [searchQuery, universities]);
 
   const getSortIcon = (isSorted: string | false) => {
     switch (isSorted) {
@@ -76,7 +91,7 @@ const UniversityTable = () =>  {
 
   const table = useReactTable({
     columns,
-    data: universities,
+    data: filteredUniversities,
     sortDescFirst: true,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel()
@@ -88,6 +103,7 @@ const UniversityTable = () =>  {
 
   return (
     <>
+      <Search value={searchQuery} onChange={setSearchQuery} placeholder="Search by name" />
       <div className="mt-4">
         <table className="min-w-full table-auto border-collapse border border-gray-300 rounded-lg shadow-md">
           <thead className="bg-gray-100 text-center ">

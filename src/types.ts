@@ -22,3 +22,9 @@ export type PaginationProps = {
   totalPages: number;
   onPageChange: (page: number) => void;
 }
+
+export type SearchInput = {
+  value: string;
+  placeholder?: string;
+  onChange: (value: string) => void;
+}
