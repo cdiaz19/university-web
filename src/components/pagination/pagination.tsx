@@ -1,4 +1,4 @@
-import { PaginationProps } from "../types";
+import { PaginationProps } from "../../types";
 
 const Pagination = ({ currentPage, totalPages, onPageChange } : PaginationProps) =>  {
   const handlePageChange = (page: number) => {

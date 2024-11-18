@@ -1,4 +1,4 @@
-import UniversityTable from './components/universityTable';
+import { UniversityTable } from './components';
 import './App.css';
 
 function App() {

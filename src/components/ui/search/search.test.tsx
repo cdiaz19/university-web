@@ -10,7 +10,7 @@ describe('Search component', () => {
 
   it('calls the onChange handler when input value changes', () => {
     const mockOnChange = vi.fn();
-    render(<Search value="" onChange={mockOnChange} />);
+    render(<Search value="" placeholder= "Search..." onChange={mockOnChange} />);
 
     const input = screen.getByPlaceholderText('Search...');
     fireEvent.change(input, { target: { value: 'new query' } });

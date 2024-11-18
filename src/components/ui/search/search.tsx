@@ -1,14 +1,15 @@
-import { SearchInput } from "../../types";
+export interface SearchProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
+  onChange: (value: string) => void;
+}
 
-const Search = ({ value, onChange, placeholder = 'Search...' } : SearchInput) =>  {
+const Search = ({ onChange, ...rest } : SearchProps) =>  {
   return (
     <div className="mb-4 max-w-prose">
       <input
         type="text"
-        placeholder={placeholder}
         className="p-2 border border-gray-300 rounded w-full"
-        value={value}
         onChange={(e) => onChange(e.target.value)}
+        { ...rest }
       />
     </div>
   );

@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ColumnDef, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { ColumnDef, SortDirection, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
-import { PageInfo, University } from '../types';
-import { fetchUniversities } from '../services';
-import Pagination from './pagination';
-import { Spinner } from './spinner';
-import { Search } from './search';
+import { PageInfo, University } from '../../types';
+import { fetchUniversities } from '../../services';
+import { Pagination } from '../pagination';
+import { Spinner } from '../ui/spinner';
+import { Search } from '../ui/search';
 
-const UniversityTable = () =>  {
+const UniversityList = () =>  {
   const [universities, setUniversities] = useState<University[]>([]);
   const [pageInfo, setPageInfo] = useState<PageInfo>({
     current_page: 1,
@@ -35,28 +35,25 @@ const UniversityTable = () =>  {
 
   useEffect(() => {
     setLoading(true);
-    const timeout = setTimeout(() => setLoading(true), 5000);
 
     setTimeout(() => {
       fetchData();
-    }, 5000);
-
-    clearTimeout(timeout);
+    }, 3000);
   }, []);
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredUniversities(universities);
-    } else {
+    if (searchQuery.trim()) {
       setFilteredUniversities(
         universities.filter((university) =>
           university.name.toLowerCase().includes(searchQuery.toLowerCase())
         )
       );
+    } else {
+      setFilteredUniversities(universities);
     }
   }, [searchQuery, universities]);
 
-  const getSortIcon = (isSorted: string | false) => {
+  const getSortIcon = (isSorted: SortDirection | boolean) => {
     switch (isSorted) {
       case 'asc':
         return <ChevronUpIcon className="w-4 h-4 inline" />;
@@ -160,7 +157,6 @@ const UniversityTable = () =>  {
       )}
     </>
   )
-
 }
 
-export default UniversityTable;
+export default UniversityList;

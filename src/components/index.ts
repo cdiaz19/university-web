@@ -1,2 +1,3 @@
-export { default as Pagination } from './pagination';
-export * from './spinner';
+export * from './pagination';
+export * from './ui';
+export * from './universityList';
