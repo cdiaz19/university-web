@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ColumnDef, SortDirection, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
-import { PageInfo, University } from '../../types';
-import { fetchUniversities } from '../../services';
-import { Pagination } from '../pagination';
-import { Spinner } from '../ui/spinner';
-import { Search } from '../ui/search';
+import { PageInfo, University } from '../../../types';
+import { fetchUniversities } from '../../../services';
+import { Pagination } from '../../pagination';
+import { Spinner } from '../../ui/spinner';
+import { Search } from '../../ui/search';
 
 const UniversityList = () =>  {
   const [universities, setUniversities] = useState<University[]>([]);
@@ -26,7 +26,7 @@ const UniversityList = () =>  {
       setUniversities(data.universities);
       setPageInfo(data.page_info);
       setLoading(false);
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       console.log('err ', err);
     } finally {
       setLoading(false);

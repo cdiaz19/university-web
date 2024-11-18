@@ -4,7 +4,9 @@ import Search from './search'
 
 describe('Search component', () => {
   it('should render correctly', () => {
-    render(<Search value="" onChange={() => {}} placeholder="Search by name"/>)
+    const mockOnChange = vi.fn();
+
+    render(<Search onChange={mockOnChange}/>)
     screen.debug()
   })
 

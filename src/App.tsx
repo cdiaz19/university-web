@@ -1,13 +1,27 @@
+import { useState } from 'react';
 import { UniversityTable } from './components';
+import { Dialog } from '@ui/';
+
 import './App.css';
 
 function App() {
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
   return (
     <>
-      <header className="header">SmarterSelect - University Management</header>
+      <div className="mt-4 flex items-center justify-between">
+        <h1 className="text-xl font-bold">University Management</h1>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
+          onClick={() => setDialogOpen(true)}
+        >
+          Add University
+        </button>
+      </div>
       <div className="mt-4">
         <UniversityTable />
       </div>
+      <Dialog isOpen={isDialogOpen} setIsOpen={setDialogOpen} />
     </>
   )
 }
