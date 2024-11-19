@@ -4,7 +4,8 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { PageInfo, University } from '../../../types';
 import { fetchUniversities } from '../../../services';
 import { Pagination } from '../../pagination';
-import { Spinner, Search } from '@ui/';
+import { Spinner, Search, Dialog } from '@ui/';
+import { Form } from '../form';
 
 const UniversityList = () =>  {
   const [universities, setUniversities] = useState<University[]>([]);
@@ -16,6 +17,8 @@ const UniversityList = () =>  {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredUniversities, setFilteredUniversities] = useState<University[]>([]);
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [universityToEdit, setUniversityToEdit] = useState<University | null>(null);
 
   const fetchData = async (page: number = 1) => {
     setLoading(true);
@@ -83,6 +86,23 @@ const UniversityList = () =>  {
       header: 'Website',
       enableSorting: true,
     },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => {
+        const university = row.original;
+        return (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleEdit(university)}
+              className="text-blue-500 hover:text-blue-700"
+            >
+              Edit
+            </button>
+          </div>
+        );
+      },
+    },
   ];
 
   const table = useReactTable({
@@ -92,6 +112,11 @@ const UniversityList = () =>  {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel()
   });
+
+  const handleEdit = (university: University) => {
+    setUniversityToEdit(university);
+    setDialogOpen(true);
+  };
 
   if (loading) {
     return <Spinner />;
@@ -154,6 +179,9 @@ const UniversityList = () =>  {
           onPageChange={fetchData}
         />
       )}
+      <Dialog isOpen={isDialogOpen} setIsOpen={setDialogOpen}>
+        <Form university={universityToEdit} onClose={() => setDialogOpen(false)} />
+      </Dialog>
     </>
   )
 }

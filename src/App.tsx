@@ -22,7 +22,7 @@ function App() {
         <UniversityList />
       </div>
       <Dialog isOpen={isDialogOpen} setIsOpen={setDialogOpen}>
-        <Form onClose={() => setDialogOpen(false)} />
+        <Form university={null} onClose={() => setDialogOpen(false)} />
       </Dialog>
     </>
   )

@@ -2,7 +2,9 @@ import { Button, Input } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { createUniversity } from '../../../services';
+import { createUniversity, updateUniversity } from '../../../services';
+import { useEffect } from 'react';
+import { University } from '../../../types';
 
 interface formData {
   name: string;
@@ -13,9 +15,10 @@ interface formData {
 
 interface FormProps {
   onClose: () => void;
+  university: University | null;
 }
 
-const Form = ({ onClose } : FormProps) =>  {
+const Form = ({ onClose, university } : FormProps) =>  {
 
   const universitySchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -36,19 +39,30 @@ const Form = ({ onClose } : FormProps) =>  {
       .min(1, 'Website is required'),
   })
 
-  const { register, handleSubmit, formState: { errors } } = useForm<formData>({ resolver: zodResolver(universitySchema) });
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<formData>({ resolver: zodResolver(universitySchema) });
+
+  useEffect(() => {
+    if (university) {
+      setValue('name', university.name);
+      setValue('location', university.location);
+      setValue('contactEmails', university.contact_emails?.join(','));
+      setValue('website', university.website);
+    }
+  }, [university, setValue]);
 
   const onSubmit = async (payload: formData) => {
     try {
-      const university = cleanUniversityData(payload);
+      const universityPayload = cleanUniversityData(payload);
 
-      const { data } = await createUniversity(university);
+      const { data } = university
+      ? await updateUniversity(universityPayload)
+      : await createUniversity(universityPayload);
 
       if (data) {
         console.log('data, ', data);
         onClose();
       } else {
-        throw new Error('Failed to add university');
+        throw new Error(university ? 'Failed to update university' : 'Failed to add university');
       }
     } catch (error) {
       console.error('Error adding university:', error);
@@ -56,12 +70,18 @@ const Form = ({ onClose } : FormProps) =>  {
   };
 
   const cleanUniversityData = (payload: formData) => {
-    return {
+    const universityData: any = { // eslint-disable-line @typescript-eslint/no-explicit-any
       name: payload.name.trim(),
       location: payload.location.trim(),
       contact_emails: payload.contactEmails.split(',').map(email => email.trim()),
       website: payload.website.trim()
     };
+
+    if (university) {
+      universityData.id = university.id;
+    }
+
+    return universityData;
   };
 
   return (

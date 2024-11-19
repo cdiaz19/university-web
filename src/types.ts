@@ -2,7 +2,7 @@ export type University = {
   id: number;
   name: string;
   location: string;
-  contactEmails: string[];
+  contact_emails: string[];
   website: string;
 }
 

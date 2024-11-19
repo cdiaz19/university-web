@@ -6,7 +6,7 @@ describe('Form component', () => {
   it('should render correctly', () => {
     const mockOnClose = vi.fn();
 
-    render(<Form onClose={mockOnClose} />)
+    render(<Form university={null} onClose={mockOnClose} />)
     screen.debug()
   });
 });

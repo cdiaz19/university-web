@@ -10,3 +10,7 @@ export const fetchUniversities = async (page: number) => {
 export const createUniversity = async (university: UniversityForm) => {
   return await universityApi.post<University>(`/universities`, { university: university });
 };
+
+export const updateUniversity = async (university: University) => {
+  return await universityApi.put<University>(`/universities/${university.id}`, { university: university });
+};
