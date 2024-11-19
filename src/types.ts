@@ -29,3 +29,11 @@ export type UniversityForm = {
   contact_emails: string[];
   website: string;
 }
+
+export type formData = {
+  id?: number;
+  name: string;
+  location: string;
+  contact_emails: string;
+  website: string;
+}

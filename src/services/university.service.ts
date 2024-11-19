@@ -1,9 +1,9 @@
 import { PageResult, University, UniversityForm } from "../types";
 import universityApi from "./axios";
 
-export const fetchUniversities = async (page: number) => {
+export const fetchUniversities = async (page: number, searchQuery: string = '') => {
   return await universityApi.get<PageResult>(`/universities`, {
-    params: { page },
+    params: { page, search: searchQuery.trim() }
   });
 };
 

@@ -1,13 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import Form from './form';
 import { vi } from 'vitest';
+import Snackbar from './snackbar';
 
-describe('Form component', () => {
+describe('Snackbar component', () => {
   it('should render correctly', () => {
     const mockOnClose = vi.fn();
-    const mockOnSubmit = vi.fn();
 
-    render(<Form onClose={mockOnClose} onSubmit={mockOnSubmit}/>)
+    render(<Snackbar message='test' isOpen={true} onClose={mockOnClose}/>)
     screen.debug()
   });
 });
