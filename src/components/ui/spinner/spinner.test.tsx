@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it } from 'vitest'
 import Spinner from './spinner'
 
 describe('Spinner component', () => {

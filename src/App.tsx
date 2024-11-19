@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { UniversityTable } from './components';
 import { Dialog } from '@ui/';
+import { Form, UniversityList } from './components/university';
 
 import './App.css';
 
@@ -19,9 +19,11 @@ function App() {
         </button>
       </div>
       <div className="mt-4">
-        <UniversityTable />
+        <UniversityList />
       </div>
-      <Dialog isOpen={isDialogOpen} setIsOpen={setDialogOpen} />
+      <Dialog isOpen={isDialogOpen} setIsOpen={setDialogOpen}>
+        <Form onClose={() => setDialogOpen(false)} />
+      </Dialog>
     </>
   )
 }

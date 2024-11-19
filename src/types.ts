@@ -2,7 +2,7 @@ export type University = {
   id: number;
   name: string;
   location: string;
-  emails: string[];
+  contactEmails: string[];
   website: string;
 }
 
@@ -21,4 +21,11 @@ export type PaginationProps = {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+}
+
+export type UniversityForm = {
+  name: string;
+  location: string;
+  contact_emails: string[];
+  website: string;
 }

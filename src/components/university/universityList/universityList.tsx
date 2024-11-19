@@ -4,8 +4,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { PageInfo, University } from '../../../types';
 import { fetchUniversities } from '../../../services';
 import { Pagination } from '../../pagination';
-import { Spinner } from '../../ui/spinner';
-import { Search } from '../../ui/search';
+import { Spinner, Search } from '@ui/';
 
 const UniversityList = () =>  {
   const [universities, setUniversities] = useState<University[]>([]);

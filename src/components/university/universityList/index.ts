@@ -1,1 +1,1 @@
-export { default as UniversityTable } from './universityList';
+export { default as UniversityList } from './universityList';
