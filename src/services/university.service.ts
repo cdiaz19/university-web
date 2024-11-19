@@ -14,3 +14,7 @@ export const createUniversity = async (university: UniversityForm) => {
 export const updateUniversity = async (university: University) => {
   return await universityApi.put<University>(`/universities/${university.id}`, { university: university });
 };
+
+export const deleteUniversity = async (universityId: number) => {
+  return await universityApi.delete<University>(`/universities/${universityId}`);
+};

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ColumnDef, SortDirection, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { PageInfo, University } from '../../../types';
-import { fetchUniversities } from '../../../services';
+import { deleteUniversity, fetchUniversities } from '../../../services';
 import { Pagination } from '../../pagination';
 import { Spinner, Search, Dialog } from '@ui/';
 import { Form } from '../form';
@@ -99,6 +99,12 @@ const UniversityList = () =>  {
             >
               Edit
             </button>
+            <button
+              onClick={() => handleDelete(university.id)}
+              className="text-red-500 hover:text-red-700"
+            >
+              Delete
+            </button>
           </div>
         );
       },
@@ -116,6 +122,17 @@ const UniversityList = () =>  {
   const handleEdit = (university: University) => {
     setUniversityToEdit(university);
     setDialogOpen(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this university?')) {
+      try {
+        await deleteUniversity(id);
+        console.log('Deleted University');
+      } catch (err) {
+        console.error('Error deleting university:', err);
+      }
+    }
   };
 
   if (loading) {
