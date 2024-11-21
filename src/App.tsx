@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useDebounce } from 'use-debounce';
+import { useDebouncedCallback } from 'use-debounce';
 import { Dialog, Search, Snackbar } from '@ui/';
 import { Pagination } from './components';
 import { Form, UniversityList } from './components/university';
@@ -20,8 +20,8 @@ function App() {
     total_entries: 0,
   });
   const [isSnackbarOpen, setSnackbarOpen] = useState(false);
-  const [error, setError] = useState('');
-  const [debouncedQuery] = useDebounce(searchQuery, 3000);
+  const [isError, setIsError] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -31,11 +31,14 @@ function App() {
     }, 3000);
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      fetchData(1, debouncedQuery);
-    }, 1000);
-  }, [debouncedQuery]);
+
+  const debounced = useDebouncedCallback(
+    (value) => {
+      setSearchQuery(value);
+      fetchData(1, value);
+    },
+    1000
+  );
 
   const fetchData = async (page: number = 1, searchQuery: string = '') => {
     setLoading(true);
@@ -47,8 +50,7 @@ function App() {
       setLoading(false);
     } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       console.error('err ', err);
-      setSnackbarOpen(true)
-      setError('Error fetching data. Please try again later.');
+      setSnackbarState(true, 'Error fetching data. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -63,15 +65,20 @@ function App() {
       if (data) {
         setDialogOpen(false);
         fetchData(pageInfo.current_page);
+        setSnackbarState(false, 'University was created successfully');
       } else {
-        setSnackbarOpen(true)
-        setError('Error adding university. Please try again later.');
+        setSnackbarState(true, 'Error adding university. Please try again later.');
       }
     } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       console.error('Error adding university:', error);
-      setSnackbarOpen(true)
-      setError('Error adding university. Please try again later.');
+      setSnackbarState(true, 'Error adding university. Please try again later.');
     }
+  };
+
+  const setSnackbarState = (isError: boolean, message: string) => {
+    setIsError(isError);
+    setSnackbarOpen(true);
+    setMessage(message);
   };
 
   return (
@@ -86,14 +93,16 @@ function App() {
         </button>
       </div>
       <div className="mt-4">
-        <Search value={searchQuery} onChange={setSearchQuery} placeholder="Search by name" />
+        <Search onChange={(value) => debounced(value)} placeholder="Search by name" />
         <UniversityList
           universitiesList={universities}
           isLoading={loading}
+          currentSearchQuery={searchQuery}
           currentPage={pageInfo.current_page}
           reFetchData={fetchData}
           setSnackbarOpen={setSnackbarOpen}
-          setError={setError}
+          setIsError={setIsError}
+          setMessage={setMessage}
           />
         { !loading && pageInfo && pageInfo.total_pages > 1 ? (
           <Pagination
@@ -106,7 +115,7 @@ function App() {
       <Dialog isOpen={isDialogOpen} setIsOpen={setDialogOpen}>
         <Form onClose={() => setDialogOpen(false)} onSubmit={onSubmit}/>
       </Dialog>
-      <Snackbar message={error} isOpen={isSnackbarOpen} onClose={() => setSnackbarOpen(false)} />
+      <Snackbar message={message} isOpen={isSnackbarOpen} isError={isError} onClose={() => setSnackbarOpen(false)} />
     </>
   )
 }

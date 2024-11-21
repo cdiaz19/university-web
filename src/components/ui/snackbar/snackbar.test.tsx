@@ -6,7 +6,7 @@ describe('Snackbar component', () => {
   it('should render correctly', () => {
     const mockOnClose = vi.fn();
 
-    render(<Snackbar message='test' isOpen={true} onClose={mockOnClose}/>)
+    render(<Snackbar message='test' isOpen={true} isError={false} onClose={mockOnClose}/>)
     screen.debug()
   });
 });

@@ -1,6 +1,7 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Button, Input } from '@headlessui/react'
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { University, formData } from '../../../types';
 
@@ -8,10 +9,16 @@ interface FormProps {
   onClose: () => void;
   university?: University;
   onSubmit: (payload: formData) => void;
-  isReadOnly?: boolean;
+  isReadOnly?: boolean
 }
 
 const Form = ({ onClose, university, onSubmit, isReadOnly = false }: FormProps) => {
+  const [readOnly, setReadOnly] = useState(isReadOnly);
+
+  const toggleReadOnly = () => {
+    setReadOnly(!readOnly);
+  };
+
   const universitySchema = z.object({
     name: z.string().min(1, 'Name is required'),
     location: z.string().min(1, 'Location is required'),
@@ -59,7 +66,7 @@ const Form = ({ onClose, university, onSubmit, isReadOnly = false }: FormProps) 
           <Input
             type="text"
             className="w-full px-3 py-2 border rounded"
-            disabled={isReadOnly}
+            disabled={readOnly}
             {...register('name')}
           />
           {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
@@ -69,17 +76,16 @@ const Form = ({ onClose, university, onSubmit, isReadOnly = false }: FormProps) 
           <Input
             type="text"
             className="w-full px-3 py-2 border rounded"
-            disabled={isReadOnly}
+            disabled={readOnly}
             {...register('location')}
           />
           {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Contact Emails (comma separated)</label>
-          <Input
-            type="text"
-            className="w-full px-3 py-2 border rounded"
-            disabled={isReadOnly}
+          <textarea
+            className="w-full px-3 py-2 border h-20 rounded resize-none"
+            disabled={readOnly}
             {...register('contact_emails')}
           />
           {errors.contact_emails && (
@@ -91,7 +97,7 @@ const Form = ({ onClose, university, onSubmit, isReadOnly = false }: FormProps) 
           <Input
             type="text"
             className="w-full px-3 py-2 border rounded"
-            disabled={isReadOnly}
+            disabled={readOnly}
             {...register('website')}
           />
           {errors.website && <p className="text-red-500 text-sm">{errors.website.message}</p>}
@@ -104,14 +110,21 @@ const Form = ({ onClose, university, onSubmit, isReadOnly = false }: FormProps) 
           >
             Cancel
           </Button>
-          { !isReadOnly ? (
+          { !readOnly ? (
             <Button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
               Submit
-            </Button>
-          ) : null }
+            </Button> ) : (
+            <button
+              type="button"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              onClick={toggleReadOnly}
+            >
+              Edit
+            </button>
+          ) }
         </div>
       </form>
     </>

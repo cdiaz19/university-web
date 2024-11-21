@@ -3,21 +3,25 @@ import { ColumnDef, SortDirection, flexRender, getCoreRowModel, getSortedRowMode
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { University, formData } from '../../../types';
 import { deleteUniversity, updateUniversity } from '../../../services';
-import { Spinner, Dialog } from '@ui/';
+import { Dialog } from '@ui/';
 import { Form } from '../form';
 import { cleanUniversityData } from '../../../utils/cleanUniversityData';
 import { DeleteUniversityDialog } from '../deleteUniversityDialog';
+import UniversityTableBody from './universityTableBody';
+import { ActionButton } from '../../actionButton';
 
 interface UniversityListProps {
   universitiesList: University[];
   isLoading: boolean;
   currentPage: number;
-  reFetchData: (currentPage: number) => void;
+  currentSearchQuery: string;
+  reFetchData: (currentPage: number, currentSearchQuery: string) => void;
   setSnackbarOpen: (state: boolean) => void;
-  setError: (message: string) => void;
+  setIsError: (state: boolean) => void;
+  setMessage: (message: string) => void;
 }
 
-const UniversityList = ({ universitiesList, isLoading, currentPage, reFetchData, setSnackbarOpen, setError} : UniversityListProps) => {
+const UniversityList = ({ universitiesList, isLoading, currentSearchQuery, currentPage, reFetchData, setSnackbarOpen, setIsError, setMessage}: UniversityListProps) => {
   const [universityToEdit, setUniversityToEdit] = useState<University>();
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -63,24 +67,24 @@ const UniversityList = ({ universitiesList, isLoading, currentPage, reFetchData,
         const university = row.original;
         return (
           <div className="flex gap-2">
-            <button
+            <ActionButton
+              tooltip="View details"
               onClick={() => handleShow(university)}
-              className="text-blue-500 hover:text-blue-700 flex items-center space-x-2"
-            >
-              <EyeIcon className="w-5 h-5" />
-            </button>
-            <button
+              icon={<EyeIcon className="w-5 h-5" />}
+              colorClass="text-blue-500 hover:text-blue-700"
+            />
+            <ActionButton
+              tooltip="Edit university"
               onClick={() => handleEdit(university)}
-              className="text-green-500 hover:text-blue-700 flex items-center space-x-2"
-            >
-              <PencilIcon className="w-5 h-5" />
-            </button>
-            <button
+              icon={<PencilIcon className="w-5 h-5" />}
+              colorClass="text-green-500 hover:text-green-700"
+            />
+            <ActionButton
+              tooltip="Delete university"
               onClick={() => openDeleteDialog(university)}
-              className="text-red-500 hover:text-red-700 flex items-center space-x-2"
-            >
-              <TrashIcon className="w-5 h-5" />
-            </button>
+              icon={<TrashIcon className="w-5 h-5" />}
+              colorClass="text-red-500 hover:text-red-700"
+            />
           </div>
         );
       },
@@ -97,31 +101,31 @@ const UniversityList = ({ universitiesList, isLoading, currentPage, reFetchData,
 
   const handleShow = (university: University) => {
     setUniversityToEdit(university);
-    setIsReadOnly(true)
+    setIsReadOnly(true);
     setDialogOpen(true);
   };
 
   const handleEdit = (university: University) => {
     setUniversityToEdit(university);
-    setIsReadOnly(false)
+    setIsReadOnly(false);
     setDialogOpen(true);
   };
 
   const openDeleteDialog = (university: University) => {
-    setUniversity(university)
-    setDeleteDialogOpen(true)
+    setUniversity(university);
+    setDeleteDialogOpen(true);
   }
 
   const handleDelete = async (id: number) => {
     try {
       await deleteUniversity(id);
-      await reFetchData(currentPage);
+      await reFetchData(currentPage, currentSearchQuery);
+      setSnackbarState(false, 'University was deleted successfully.');
     } catch (err) {
       console.error('Error deleting university:', err);
-      setSnackbarOpen(true);
-      setError('Error deleting university. Please try again later.');
+      setSnackbarState(true, 'Error deleting university. Please try again later.');
     } finally {
-      setDeleteDialogOpen(false)
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -133,17 +137,22 @@ const UniversityList = ({ universitiesList, isLoading, currentPage, reFetchData,
 
       if (data) {
         setDialogOpen(false);
-        await reFetchData(currentPage);
+        await reFetchData(currentPage, currentSearchQuery);
+        setSnackbarState(false, 'University updated successfully.');
       } else {
         console.error('Failed to update university');
-        setSnackbarOpen(true);
-        setError('Error updating university. Please try again later.');
+        setSnackbarState(true, 'Error updating university. Please try again later.');
       }
     } catch (error) {
       console.error('Error updating university:', error);
-      setSnackbarOpen(true);
-      setError('Error updating university. Please try again later.');
+      setSnackbarState(true, 'Error updating university. Please try again later.');
     }
+  };
+
+  const setSnackbarState = (isError: boolean, message: string) => {
+    setIsError(isError);
+    setSnackbarOpen(true);
+    setMessage(message);
   };
 
   return (
@@ -180,35 +189,16 @@ const UniversityList = ({ universitiesList, isLoading, currentPage, reFetchData,
             ))}
           </thead>
           <tbody>
-          {isLoading ? (
-            <tr>
-              <td className='h-32' colSpan={5}>
-                <Spinner />
-              </td>
-            </tr>
-          ) : (
-            table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50 transition-colors">
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="px-6 py-4 text-sm text-gray-800 border-b border-gray-200"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))
-          )}
+            <UniversityTableBody isLoading={isLoading} rows={table.getRowModel().rows} />
           </tbody>
         </table>
       </div>
       <Dialog isOpen={isDialogOpen} setIsOpen={setDialogOpen}>
-        <Form university={universityToEdit} onClose={() => setDialogOpen(false)} onSubmit={onSubmit} isReadOnly={isReadOnly}/>
+        <Form university={universityToEdit} onClose={() => setDialogOpen(false)} onSubmit={onSubmit} isReadOnly={isReadOnly} />
       </Dialog>
       <DeleteUniversityDialog isOpen={isDeleteDialogOpen} university={university} onClose={() => setDeleteDialogOpen(false)} onDelete={() => handleDelete(university.id)} />
     </>
   )
-}
+};
 
 export default UniversityList;
